@@ -20,7 +20,7 @@ public class BookModel {
 
     public ResultSet getBooks() throws SQLException {
         // Chuan bi cau lenh truy van
-        String sql = "SELECT * FROM books";
+        String sql = "SELECT books.*, categories.name as category_name FROM books JOIN categories ON books.category_id = categories.id";
         PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
         // thuc thi cau lenh truy van
         return preparedStatement.executeQuery();
@@ -35,4 +35,43 @@ public class BookModel {
         // thuc thi cau lenh truy van
         preparedStatement.execute();
     }
+
+    public void store(Book book) throws SQLException {
+        String sql = "INSERT INTO books(name, description, price, category_id) VALUE (?, ?, ?, ?)";
+        PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
+        preparedStatement.setString(1, book.getName());
+        preparedStatement.setString(2, book.getDescription());
+        preparedStatement.setInt(3, book.getPrice());
+        preparedStatement.setInt(4, book.getCategory_id());
+        preparedStatement.execute();
+    }
+
+    public ResultSet search(String name) throws SQLException {
+        // Chuan bi cau lenh truy van
+        String sql = "SELECT books.*, categories.name as category_name FROM books JOIN categories ON books.category_id = categories.id WHERE books.name LIKE ?";
+        PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
+        // set params
+        preparedStatement.setString(1, "%" + name + "%");
+        // thuc thi cau lenh truy van
+        return preparedStatement.executeQuery();
+    }
+
+    public ResultSet getBookById(int id) throws SQLException {
+        String sql = "SELECT books.*, categories.name as category_name FROM books JOIN categories ON books.category_id = categories.id WHERE books.id = ?";
+        PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
+        preparedStatement.setInt(1, id);
+        return preparedStatement.executeQuery();
+    }
+
+    public void update(Book book) throws SQLException {
+        String sql = "UPDATE books SET name =?, description =?, price =?, category_id =? WHERE id =?";
+        PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
+        preparedStatement.setString(1, book.getName());
+        preparedStatement.setString(2, book.getDescription());
+        preparedStatement.setInt(3, book.getPrice());
+        preparedStatement.setInt(4, book.getCategory_id());
+        preparedStatement.setInt(5, book.getId());
+        preparedStatement.execute();
+    }
+
 }

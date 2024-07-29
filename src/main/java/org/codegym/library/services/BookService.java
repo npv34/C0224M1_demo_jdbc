@@ -1,6 +1,7 @@
 package org.codegym.library.services;
 
 import org.codegym.library.entity.Book;
+import org.codegym.library.entity.Category;
 import org.codegym.library.models.BookModel;
 
 import javax.servlet.RequestDispatcher;
@@ -29,8 +30,15 @@ public class BookService {
             String description = resultSet.getString("description");
             int price = resultSet.getInt("price");
             int category_id = resultSet.getInt("category_id");
-            Book book =new Book(name, description, price, category_id);
+            String nameCategory = resultSet.getString("category_name");
+
+            Book book = new Book(name, description, price, category_id);
             book.setId(id);
+            // Them category vao book
+            Category category = new Category(nameCategory);
+            category.setId(category_id);
+
+            book.setCategory(category);
             books.add(book);
         }
         return books;
@@ -39,5 +47,85 @@ public class BookService {
     public void deleteBooks(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         int id = Integer.parseInt(request.getParameter("id"));
         this.bookModel.destroyBook(id);
+    }
+
+    public void createBook(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        String name = request.getParameter("name");
+        String description = request.getParameter("description");
+        String price = request.getParameter("price");
+        String category_id = request.getParameter("category_id");
+
+        int priceInt = Integer.parseInt(price);
+
+        Book book = new Book(name, description, priceInt, Integer.parseInt(category_id));
+        this.bookModel.store(book);
+    }
+
+    public List<Book> searchBooks(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        String keyword = request.getParameter("keyword");
+        ResultSet resultSet = this.bookModel.search(keyword);
+        List<Book> books = new ArrayList<>();
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            String description = resultSet.getString("description");
+            int price = resultSet.getInt("price");
+            int category_id = resultSet.getInt("category_id");
+            String nameCategory = resultSet.getString("category_name");
+
+            Book book = new Book(name, description, price, category_id);
+            book.setId(id);
+            // Them category vao book
+            Category category = new Category(nameCategory);
+            category.setId(category_id);
+
+            book.setCategory(category);
+            books.add(book);
+        }
+        return books;
+    }
+
+    public Book findByID(HttpServletRequest request) throws SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        // Tim kiem book theo id
+        ResultSet resultSet = this.bookModel.getBookById(id);
+        Book book = null;
+        while (resultSet.next()) {
+            int idBook = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            String description = resultSet.getString("description");
+            int price = resultSet.getInt("price");
+            int category_id = resultSet.getInt("category_id");
+            String nameCategory = resultSet.getString("category_name");
+
+            book = new Book(name, description, price, category_id);
+            book.setId(idBook);
+            // Them category vao book
+            Category category = new Category(nameCategory);
+            category.setId(category_id);
+
+            book.setCategory(category);
+        }
+
+        return book;
+    }
+
+    public void updateBook(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        // lay data from request
+        int id = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        String description = request.getParameter("description");
+        String price = request.getParameter("price");
+        String category_id = request.getParameter("category_id");
+
+        int priceInt = Integer.parseInt(price);
+
+        // tao book moi
+        Book book = new Book(name, description, priceInt, Integer.parseInt(category_id));
+        book.setId(id);
+
+        // cap nhat book vao database
+        this.bookModel.update(book);
+
     }
 }
