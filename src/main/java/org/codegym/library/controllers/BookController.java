@@ -83,8 +83,10 @@ public class BookController extends HttpServlet {
 
     public void renderListBooks(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         // get data from model
-        List<Book> books = this.bookService.getAllBooks();
+        List<Book> books = this.bookService.getAllBooks(request);
         request.setAttribute("books", books);
+        int totalBooks = this.bookService.getBookCount();
+        request.setAttribute("totalBooks", totalBooks);
         RequestDispatcher requestDispatcher = request.getRequestDispatcher("/views/books/list.jsp");
         requestDispatcher.forward(request, response);
     }

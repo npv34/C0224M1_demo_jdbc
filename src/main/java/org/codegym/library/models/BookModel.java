@@ -26,6 +26,16 @@ public class BookModel {
         return preparedStatement.executeQuery();
     }
 
+    public ResultSet getBooksByOffset(int offset, int limit) throws SQLException {
+        // Chuan bi cau lenh truy van
+        String sql = "SELECT books.*, categories.name as category_name FROM books JOIN categories ON books.category_id = categories.id LIMIT ? OFFSET ? ";
+        PreparedStatement preparedStatement = this.conn.prepareStatement(sql);
+        preparedStatement.setInt(1, limit);
+        preparedStatement.setInt(2, offset);
+        // thuc thi cau lenh truy van
+        return preparedStatement.executeQuery();
+    }
+
     public void destroyBook(int id) throws SQLException {
         // Chuan bi cau lenh truy van
         String sql = "DELETE FROM books WHERE id = ?";

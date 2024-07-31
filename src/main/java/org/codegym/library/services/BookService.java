@@ -20,10 +20,24 @@ public class BookService {
     public BookService() {
         this.bookModel = new BookModel();
     }
-    public List<Book> getAllBooks() throws SQLException {
+    public List<Book> getAllBooks(HttpServletRequest request) throws SQLException {
         // Xu ly ket qua tra ve
         List<Book> books = new ArrayList<>();
-        ResultSet resultSet = this.bookModel.getBooks();
+        String page = request.getParameter("page");
+        String limit = request.getParameter("limit");
+        ResultSet resultSet = null;
+
+        if (page == null || limit == null) {
+            resultSet = this.bookModel.getBooks();
+        } else {
+            int intPage = Integer.parseInt(page);
+            int intLimit = Integer.parseInt(limit);
+            // vd page = 2 & limit = 5 -> lay phan tu tu 5 - 10
+            // vd page = 3 & limit = 5 -> lay phan tu tu 15 - 20
+            int offset = (intPage - 1 ) * intLimit;
+            resultSet = this.bookModel.getBooksByOffset(offset, intLimit);
+        }
+
         while (resultSet.next()) {
             int id = resultSet.getInt("id");
             String name = resultSet.getString("name");
@@ -43,6 +57,16 @@ public class BookService {
         }
         return books;
     }
+
+    public int getBookCount() throws SQLException {
+        ResultSet resultSet = this.bookModel.getBooks();
+        int count = 0;
+        while (resultSet.next()) {
+            count++;
+        }
+        return count;
+    }
+
 
     public void deleteBooks(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         int id = Integer.parseInt(request.getParameter("id"));

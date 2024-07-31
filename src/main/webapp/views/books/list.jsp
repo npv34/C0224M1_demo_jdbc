@@ -10,7 +10,12 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
-<% List<Book> books = (List<Book>) request.getAttribute("books"); %>
+<% List<Book> books = (List<Book>) request.getAttribute("books");
+    int limit = request.getParameter("limit") != null ? Integer.parseInt(request.getParameter("limit")) : 2;
+    int totalBook = (int) request.getAttribute("totalBooks");
+    int totalPage = (int) (double) (totalBook / limit);
+    int currentPage = request.getParameter("page")!= null? Integer.parseInt(request.getParameter("page")) : 1;
+%>
 <html>
 <head>
     <title>Title</title>
@@ -40,10 +45,15 @@
 <body>
 <h2>Book list</h2>
 <a href="/books/create" class="btn-create">Create</a>
+
 <form action="/books/search" method="get">
     <input type="text" name="keyword">
     <input type="submit" value="Search">
 </form>
+<% for (int i = 1; i <= totalPage ; i++) { %>
+<a href="/books?page=<%= i %>&limit=<%= limit%>"><%= i %></a>
+<% } %>
+<a href="/books?page=<%= currentPage + 1 %>&limit=<%= limit%>">Next</a>
 <table>
     <tr>
         <td>#</td>
